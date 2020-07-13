@@ -1,0 +1,180 @@
+﻿
+@model List<Vidly.Models.Movie>
+
+<h2>
+    Movies
+</h2>
+
+@Html.ActionLink("New Movie", "New", "Movies", null, new { @class = "btn btn-primary", @style = "margin-bottom: 20px;"})
+
+@if (Model.Count == 0)
+{
+    <p>There's no movies yet</p>
+}
+else
+{
+
+ <table class="table table-bordered table-hover text-center" style="margin-top: 20px;" id="movies">
+    <thead>
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Genre
+            </th>
+            <th>
+                Release Date
+            </th>
+            <th>
+                Date Added
+            </th>
+            <th>
+                Number In Stock
+            </th>
+            <th>
+                Edit
+            </th>
+            <th>
+                Delete
+            </th>
+        </tr>
+    </thead>
+    @*<tbody>
+        @foreach(var movie in Model)
+                {
+            <tr>
+                <td>
+                    @Html.ActionLink(movie.Name, "Edit", "Movies", new { id = movie.ID }, null)
+                </td>
+                <td>
+                    @movie.Genre.Name
+                </td>
+                <td>
+                    @movie.DataAdded
+                </td>
+                <td>
+                    @movie.ReleaseDate
+                </td>
+                <td>
+                    @movie.NumberInStock
+                </td>
+            </tr>
+        }
+    </tbody>*@
+</table>
+}
+
+@section scripts
+    {
+        <script>
+            $(document).ready(function () {
+                var table = $("#movies").DataTable({
+                    ajax: {
+                        url: "/api/movies",
+                        dataSrc: ""
+                    },
+
+                    columns: [
+                        {
+                            data: "name",
+                            render: function (data, type, movie) {
+                                return "<button class='btn-link js-details' data-movie-id="
+                                    + movie.id + ">"
+                                    + movie.name + "</button>";
+                            }
+                        },
+                        {
+                            data: "genre.name"
+                        },
+                        {
+                            data: "releaseDate"
+                        },
+                        {
+                            data: "dataAdded"
+                        },
+                        {
+                            data: "numberInStock"
+                        },
+                        {
+                            data: "name",
+                            render: function (data, type, movie) {
+                                return "<a href='/movies/edit/" + movie.id + "'>" + movie.name + "</a>";
+                            }
+                        },
+                        {
+                            data: "id", 
+                            render: function (data) {
+                                return "<button class='btn-link js-delete' data-movie-id=" + data + ">Delete</button>";
+                            }
+                        }
+                    ]
+                }) // End Of Movies DataTable
+                $("#movies").on("click", ".js-details", function () {
+                    var btnDetails = $(this);
+
+                    $.ajax({
+                        url: "/api/movies/" + btnDetails.attr("data-movie-id"),
+                        method: "GET",
+                        success: function (result) {
+                            console.log(result);
+
+                            bootbox.confirm({
+                                message: 
+                                    "<p> Movie Name : " + result.name + " </p> <p> Added Date : " + result.dataAdded + "</p>"
+                                    + "<p> Release Date : " + result.releaseDate + "</p>"
+                                    + "<p> Genre Type : " + result.genre.name + "</p>"
+                                    + "<p> Number In Stock : " + result.numberInStock + "</p>" 
+                                ,
+                                buttons: {
+                                    confirm: {
+                                        label: "OK",
+                                        className: "btn btn-success"
+                                    },
+                                    cancel: {
+                                        label: "DELETE",
+                                        className: "btn btn-danger js-delete"
+                                    }
+                                },
+                                callback: function (res) {
+                                    
+                                    if (!res) {
+                                        $.ajax({
+                                            url: "/api/movies/" + result.id,
+                                            method: "DELETE",
+                                            success: function (del) {
+                                                table.row(btnDetails.parents("tr")).remove().draw();
+                                            }
+                                        })
+                                    }
+                                }
+                            });
+
+                        }
+                    })
+                }) // End Of Details Ajax Button
+
+                $("#movies").on("click", ".js-delete", function () {
+                    var deleteBtn = $(this);
+
+                    bootbox.confirm("Are you want to delete this movie ?", function (result) {
+
+                        if (result) {
+                            console.log("From Calling delete api");
+                            $.ajax({
+                                url: "/api/movies/" + deleteBtn.attr("data-movie-id"),
+                                method: "DELETE",
+                                success: function (del) {
+                                    table.row(deleteBtn.parents("tr")).remove().draw();
+                                }
+                            }); // End Of Ajax Call For The API
+                        }
+                        
+                    })// End Of BootBox For Confirm The Delete
+                })// End Of Delete Ajax Button
+
+            })// End Of Documnet.Ready Function
+        </script>
+    }
+
+

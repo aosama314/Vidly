@@ -1,0 +1,263 @@
+﻿
+@model List<Vidly.Models.Customer>
+
+<h2>
+    Customers
+</h2>
+@*@if (Model.Count == 0)
+    {
+        <p>There's no customers yet</p>
+    }
+    else
+    {
+        <table class="table table-bordered table-hover" id="customers">
+            <thead>
+                <tr>
+                    <td>
+                        Customers
+                    </td>
+                    <td>
+                        Membership Type
+                    </td>
+                    <td>
+                        Edit
+                    </td>
+                    <td>
+                        Delete
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var customer in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.ActionLink(customer.Name, "Details", "Customers", new { id = customer.ID }, null)
+                        </td>
+                        <td>
+                            @customer.MembershipType.MembershipName
+                        </td>
+                        <td>
+                            @Html.ActionLink(customer.Name, "Edit", "Customers", new { id = customer.ID }, null)
+                        </td>
+                        <td>
+                            <button data-customer-id="@customer.ID" class="btn-link js-delete">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }*@
+
+@Html.ActionLink("New Customer", "New", "Customers", null, new { @class = "btn btn-primary", @style="margin-bottom: 15px;" })
+
+@*<button class="btn btn-primary add-btn" style="margin-bottom: 15px;">Add Customer</button>*@
+<table class="table table-bordered table-hover" id="customers">
+    <thead>
+        <tr>
+            <td>
+                Customers
+            </td>
+            <td>
+                Membership Type
+            </td>
+            <td>
+                Edit
+            </td>
+            <td>
+                Delete
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+
+@section scripts
+    {
+    <script>
+        $(document).ready(function () {
+            var table = $("#customers").DataTable({
+                ajax: {
+                    url: "/api/customers",
+                    dataSrc: ""
+                },
+                columns: [
+                    {
+                        data: "name",
+                        render: function (data, type, customer) {
+                            //return "<a href='/customers/details/" + customer.id + "'>" + customer.name + "</a>";
+                            //return "<button class='btn-link js-details' data-birthDate=" + customer.birthDate + " data-customer-name=" + customer.name + " >" + customer.name + "</button>";
+                            return "<button class='btn-link js-details' data-customer-id=" + customer.id + ">" + customer.name + "</button>";
+                        }
+                    },
+                    {
+                        data: "membershipType.membershipName"
+                    },
+                    {
+                        data: "name",
+                        render: function (data, type, customer) {
+                            return "<a href='/customers/edit/" + customer.id + "'>" + customer.name + "</a>";
+                        }
+                    },
+                    {
+                        data: "id",
+                        render: function (data) {
+                            return "<button class='btn-link js-delete' data-customer-id=" + data + ">Delete</button>";
+                        }
+                    }
+                ]
+            });
+            $(".add-btn").on("click", function () {
+                var buttonAdd = $(this);
+                bootbox.confirm({
+                    message: "<h3>Add New Customer</h3>" + `
+
+
+
+        `,
+                    buttons: {
+                        confirm: {
+                            label: "Add",
+                            className: "btn btn-success"
+                        },
+                        cancel: {
+                            label: "Cancel",
+                            className: "btn btn-danger"
+                        }
+                    },
+                    callback: function (res) {
+                        console.log();
+                        console.log(res);
+                    }
+                });
+            });
+            $("#customers").on("click", ".js-details", function () {
+                var buttonDetails = $(this);
+
+                //bootbox.confirm(
+                //    "Customer " + buttonDetails[0].outerText,
+                //    function (result) {
+                //        if (result) {
+                //            console.log(buttonDetails[0].outerText);
+                //            console.log(buttonDetails.attr("data-birthDate"));
+                //        }
+                //    }
+                //);
+                $.ajax({
+                    url: "/api/customers/" + buttonDetails.attr("data-customer-id"),
+                    method: "GET",
+                    success: function (result) {
+                        console.log(result);
+
+                        //bootbox.confirm(
+                        //    "<p> Customer Name : " + result.name + " </p> <p> Date Of Birth : " + result.birthDate + "</p>" +
+                        //    "<p> Membership Type Is " + result.membershipType.membershipName + "</p>",
+                        //    function (res) {
+                        //        console.log(res);
+                        //    }
+                        //);
+                        bootbox.confirm({
+                            message:
+                                "<p> Customer Name : " + result.name + " </p> <p> Date Of Birth : " + result.birthDate + "</p>" +
+                                "<p> Membership Type Is " + result.membershipType.membershipName + "</p>",
+                            buttons: {
+                                confirm: {
+                                    label: "OK",
+                                    className: "btn btn-success"
+                                },
+                                cancel: {
+                                    label: "DELETE",
+                                    className: "btn btn-danger js-delete"
+                                }
+                            },
+                            callback: function (res) {
+                                if (!res) {
+                                    $.ajax({
+                                        url: "/api/customers/" + result.id,
+                                        method: "DELETE",
+                                        success: function (del) {
+                                            //table.row()
+                                            table.row(buttonDetails.parents("tr")).remove().draw();
+                                        }
+                                    })
+                                }
+                            }
+                        });
+                    }
+                });
+                console.log(buttonDetails);
+            });
+            $("#customers").on("click", ".js-delete", function () {
+
+                var button = $(this);
+
+                bootbox.confirm("Are you sure to delete this customer?", function (result) {
+                    if (result) {
+                        $.ajax({
+                            url: "/api/customers/" + button.attr("data-customer-id"),
+                            method: "DELETE",
+                            success: function () {
+                                //button.parents("tr").remove();
+                                //console.log(table);
+                                table.row(button.parents("tr")).remove().draw();
+                            }
+                        });
+                    }
+                });
+
+                //if (confirm("Are you sure to delete this customer?")) {
+                //    $.ajax({
+                //        url: "/api/customers/" + button.attr("data-customer-id"),
+                //        method: "DELETE",
+                //        success: function () {
+                //            button.parents("tr").remove();
+                //        }
+                //    });
+                //}
+            });
+
+            $(".bootbox").on("click", ".js-delete", function () {
+
+                var button = $(this);
+
+                bootbox.confirm("Are you sure to delete this customer?", function (result) {
+                    if (result) {
+                        $.ajax({
+                            url: "/api/customers/" + button.attr("data-customer-id"),
+                            method: "DELETE",
+                            success: function () {
+                                //button.parents("tr").remove();
+                                //console.log(table);
+                                table.row(button.parents("tr")).remove().draw();
+                            }
+                        });
+                    }
+                });
+
+                //if (confirm("Are you sure to delete this customer?")) {
+                //    $.ajax({
+                //        url: "/api/customers/" + button.attr("data-customer-id"),
+                //        method: "DELETE",
+                //        success: function () {
+                //            button.parents("tr").remove();
+                //        }
+                //    });
+                //}
+            });
+        });
+    </script>
+}
+
+
+
+
+
+
+
+
+
+
