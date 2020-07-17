@@ -48,8 +48,8 @@ namespace Vidly
 
             // Uncomment the following lines to enable logging in with third party login providers
             //app.UseMicrosoftAccountAuthentication(
-            //    clientId: "",
-            //    clientSecret: "");
+            //    clientId: "4bd3c568-4c1d-40e6-ae87-be989a3ba0e4",
+            //    clientSecret: "4MN7kt4TZ.Er2.~2C8vSD95UbU4SnFYo4~");
 
             //app.UseTwitterAuthentication(
             //   consumerKey: "",
@@ -57,11 +57,11 @@ namespace Vidly
 
             app.UseFacebookAuthentication(appId: "607974260102748",appSecret: "e2cc61309a547dd30bf9b003e241fa24");
 
-            //app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
-            //{
-            //    ClientId = "",
-            //    ClientSecret = ""
-            //});
+            app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
+            {
+                ClientId = "443108464421-l6mlaaf6ls427sjp96f0plh3fk2sgrno.apps.googleusercontent.com",
+                ClientSecret = "WEsLZ530HRKcdLqY6P24Kous"
+            });
         }
     }
 }
