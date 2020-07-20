@@ -91,6 +91,12 @@
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
+    <Reference Include="SendGrid, Version=9.18.0.0, Culture=neutral, PublicKeyToken=4f047e93159395ca, processorArchitecture=MSIL">
+      <HintPath>..\packages\SendGrid.9.18.0\lib\net452\SendGrid.dll</HintPath>
+    </Reference>
+    <Reference Include="StarkbankEcdsa, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\starkbank-ecdsa.1.2.0\lib\net452\StarkbankEcdsa.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -218,8 +224,16 @@
     <Compile Include="Migrations\202007131720380_AddDrivingLicenseToApplicationUser.Designer.cs">
       <DependentUpon>202007131720380_AddDrivingLicenseToApplicationUser.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202007191405487_AddPhoneNumberToApplicationUser.cs" />
+    <Compile Include="Migrations\202007191405487_AddPhoneNumberToApplicationUser.Designer.cs">
+      <DependentUpon>202007191405487_AddPhoneNumberToApplicationUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202007191407381_RemovePhoneNumberToApplicationUser.cs" />
+    <Compile Include="Migrations\202007191407381_RemovePhoneNumberToApplicationUser.Designer.cs">
+      <DependentUpon>202007191407381_RemovePhoneNumberToApplicationUser.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="ViewModels\AccountViewModels.cs" />
     <Compile Include="Models\Customer.cs" />
     <Compile Include="Models\Genre.cs" />
     <Compile Include="Models\IdentityModels.cs" />
@@ -231,9 +245,18 @@
     <Compile Include="Models\VidlyContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="ViewModels\ExternalLoginConfirmationViewModel.cs" />
+    <Compile Include="ViewModels\ExternalLoginListViewModel.cs" />
+    <Compile Include="ViewModels\ForgotPasswordViewModel.cs" />
+    <Compile Include="ViewModels\ForgotViewModel.cs" />
+    <Compile Include="ViewModels\LoginViewModel.cs" />
     <Compile Include="ViewModels\NewCustomerViewModel.cs" />
     <Compile Include="ViewModels\NewMovieViewModel.cs" />
     <Compile Include="ViewModels\RandomMovieViewModel.cs" />
+    <Compile Include="ViewModels\RegisterViewModel.cs" />
+    <Compile Include="ViewModels\ResetPasswordViewModel.cs" />
+    <Compile Include="ViewModels\SendCodeViewModel.cs" />
+    <Compile Include="ViewModels\VerifyCodeViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-darkly.css" />
@@ -494,6 +517,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202007131720380_AddDrivingLicenseToApplicationUser.resx">
       <DependentUpon>202007131720380_AddDrivingLicenseToApplicationUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202007191405487_AddPhoneNumberToApplicationUser.resx">
+      <DependentUpon>202007191405487_AddPhoneNumberToApplicationUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202007191407381_RemovePhoneNumberToApplicationUser.resx">
+      <DependentUpon>202007191407381_RemovePhoneNumberToApplicationUser.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
