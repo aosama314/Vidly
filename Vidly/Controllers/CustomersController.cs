@@ -9,6 +9,7 @@ using Vidly.ViewModels;
 using Vidly.Controllers.API;
 using AutoMapper;
 using Vidly.Dtos;
+using System.Web.UI;
 
 namespace Vidly.Controllers
 {
@@ -95,6 +96,7 @@ namespace Vidly.Controllers
         }
 
         // GET: Customers
+        [OutputCache(Duration = 50, Location = OutputCacheLocation.Server, VaryByParam = "*")]
         public ActionResult Index()
         {
             var customers = Context.Customers.Include(c => c.MembershipType).ToList();
