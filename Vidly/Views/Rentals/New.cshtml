@@ -1,0 +1,178 @@
+﻿
+@model dynamic
+
+@{ 
+    ViewBag.Title = "New Rental";
+}
+
+    <h2> New Rental Form </h2>
+
+    <form id="newRental">
+
+        <div class="form-group">
+            <label>Customer</label>
+            <div class="tt-container">
+                <input id="customer" name="customer" data-rule-validCustomer="true" type="text" value="" class="form-control" required />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Movie</label>
+            <div class="tt-container">
+                <input id="movie" name="movie" data-rule-validMovie="true" type="text" value="" class="form-control" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 col-sm-4">
+                <ul class="list-group" id="movies"></ul>
+            </div>
+        </div>
+
+        <button class="btn btn-primary">Submit</button>
+
+    </form>
+
+@section scripts {
+
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+
+
+
+        $(document).ready(function () {
+
+            var vm = {
+                movieIDs: []
+            };
+
+            var customers = new Bloodhound({
+                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                remote: {
+                    url: '/api/customers?query=%QUERY',
+                    wildcard: '%QUERY'
+                }
+            });
+
+            $('#customer').typeahead({
+                minLength: 2,
+                highlight: true
+            },
+            {
+                name: 'customers',
+                display: 'name',
+                source: customers
+            }).on("typeahead:select", function (e, customer) {
+
+                //console.log(customer.id);
+
+                vm.customerID = customer.id;
+
+            });
+
+            var movies = new Bloodhound({
+                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                remote: {
+                    url: '/api/movies?query=%QUERY',
+                    wildcard: '%QUERY'
+                }
+            });
+
+            $('#movie').typeahead({
+                minLength: 2,
+                highlight: true
+            },
+            {
+                name: 'movies',
+                display: 'name',
+                source: movies
+            }).on("typeahead:select", function (e, movie) {
+
+                //console.log(movie.id);
+                $("#movies").append("<li class='list-group-item'>" + movie.name + "</li>");
+
+                $("#movie").typeahead("val", "");
+
+                vm.movieIDs.push(movie.id);
+                    
+            });
+
+
+            $.validator.addMethod("validCustomer", function () {
+                return vm.customerID && vm.customerID !== 0;
+            }, "Please select a valid customer.");
+
+            var validator = $("#newRental").validate({
+                submitHandler: function () {
+                    
+                    $.ajax({
+
+                        url: "/api/Rental/CreateNewRentals",
+                        method: "POST",
+                        data: vm
+
+                    })
+                    .done(function () {
+                        toastr.success("Rentals successfully recorded.");
+
+                        $("#customer").typeahead("val", "");
+                        $("#movie").typeahead("val", "");
+                        $("#movies").empty();
+
+                        vm = { movieIDs: [] };
+
+                        validator.resetForm();
+
+
+                        //console.log("Done");
+                    })
+                    .fail(function () {
+                        //console.log(e);
+                        toastr.error("Something unexpected happend.");
+
+                        //console.log("Fail");
+                    }); // End Of Ajax Call
+
+                    return false;
+                }
+            });
+
+            $.validator.addMethod("validMovie", function () {
+                return vm.movieIDs.length > 0;
+            }, "Please select at least one movie.");
+
+
+            //$("#newRental").submit(function (e) {
+
+            //    //e.preventDefault();
+
+            //    //$.ajax({
+
+            //    //    url: "/api/Rental/CreateNewRentals",
+            //    //    method: "POST",
+            //    //    data: vm
+
+            //    //})
+            //    //.done(function () {
+            //    //    $("#customer").typeahead("val", "");
+
+
+            //    //    toastr.success("Rentals successfully recorded.");
+                    
+            //    //    //console.log("Done");
+            //    //})
+            //    //.fail(function () {
+
+            //    //    toastr.fail("Something unexpected happend.");
+
+            //    //    //console.log("Fail");
+            //    //}); // End Of Ajax Call
+
+            //});
+        });
+    </script>
+
+    } 
