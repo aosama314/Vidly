@@ -25,7 +25,7 @@
 
         <div class="row">
             <div class="col-md-4 col-sm-4">
-                <ul class="list-group" id="movies"></ul>
+                <ul class="list-group" style="width: 70%;" id="movies"></ul>
             </div>
         </div>
 
@@ -92,7 +92,7 @@
             }).on("typeahead:select", function (e, movie) {
 
                 //console.log(movie.id);
-                $("#movies").append("<li class='list-group-item'>" + movie.name + "</li>");
+                $("#movies").append("<li class='list-group-item'>" + movie.name + "<div data-movie-id=" + movie.id + " class='btn btn-danger js-delete' style='margin-left: 35px;'> Delete </div> " + "</li>");
 
                 $("#movie").typeahead("val", "");
 
@@ -100,6 +100,21 @@
                     
             });
 
+            $("#movies").on("click", ".js-delete", function () {
+                var deleteBtn = $(this);
+
+                deleteBtn.parents("li").remove();
+
+                vm.movieIDs.forEach(d => {
+                    if (d == deleteBtn.attr("data-movie-id"))
+                        vm.movieIDs.pop(d);
+                });
+
+
+                console.log(deleteBtn.attr("data-movie-id"));
+
+                console.log(vm.movieIDs);
+            });
 
             $.validator.addMethod("validCustomer", function () {
                 return vm.customerID && vm.customerID !== 0;
